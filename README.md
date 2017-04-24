@@ -32,5 +32,5 @@ hadoop fs -rm /user/YOUR-USERNAME/tweet/output/part-r-00000
 hadoop fs -rm /user/YOUR-USERNAME/tweet/output/_SUCCESS
 
 To remove a directory, ensure it is empty, and then use:
-fs -rmdir /user/YOUR-USERNAME/tweet/output/
+hadoop fs -rmdir /user/YOUR-USERNAME/tweet/output/
 

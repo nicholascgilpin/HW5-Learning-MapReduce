@@ -29,13 +29,15 @@ public class MapreduceSleep {
             
             StringTokenizer iterable = new StringTokenizer(value.toString());
             
-            if(iterable.nextToken().equals("T")){
-                iterable.nextToken();
-                hour.set(iterable.nextToken().substring(0, 2));
+            if(iterable.hasMoreTokens()){
+                if(iterable.nextToken().equals("T")){
+                    iterable.nextToken();
+                    hour.set(iterable.nextToken().substring(0, 2));
 
-                while (iterable.hasMoreTokens()) {
-                    if(iterable.nextToken().equals("sleep")){
-                        context.write(hour, one);
+                    while (iterable.hasMoreTokens()) {
+                        if(iterable.nextToken().equals("sleep")){
+                            context.write(hour, one);
+                        }
                     }
                 }
             }
@@ -60,8 +62,10 @@ public class MapreduceSleep {
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
-        conf.setInt(NLineInputFormat.LINES_PER_MAP, 4);
         Job job = Job.getInstance(conf, "sleep count");
+        conf.setInt(NLineInputFormat.LINES_PER_MAP, 4);
+        job.getConfiguration().setInt("mapreduce.input.lineinputformat.linespermap", 4);
+        NLineInputFormat.addInputPath(job, new Path(args[0]));
         job.setJarByClass(MapreduceSleep.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setCombinerClass(IntSumReducer.class);
@@ -69,7 +73,6 @@ public class MapreduceSleep {
         job.setInputFormatClass(NLineInputFormat.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
-        FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
