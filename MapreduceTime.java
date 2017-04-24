@@ -27,7 +27,7 @@ public class MapreduceTime {
                        ) throws IOException, InterruptedException {
             StringTokenizer iterable = new StringTokenizer(value.toString());
             
-            while(iterable.hasMoreTokens()){
+            if(iterable.hasMoreTokens()){
                 if(iterable.nextToken().equals("T")){
                     iterable.nextToken();
                     hour.set(iterable.nextToken().substring(0, 2));
