@@ -27,15 +27,15 @@ public class MapreduceSleep {
         public void map(Object key, Text value, Context context
                         ) throws IOException, InterruptedException {
             
-            StringTokenizer iterable = new StringTokenizer(value.toString());
-            String line = value.toString().toLowerCase();
+            StringTokenizer iterable = new StringTokenizer(value.toString()); //For getting the time
+            String line = value.toString().toLowerCase(); //For getting the line potentially containing sleep
             
-            if(iterable.hasMoreTokens() || line != null){
-                if(iterable.nextToken().equals("T")){
+            if(iterable.hasMoreTokens() || line != null){ //If the string token has T or is not null, go in
+                if(iterable.nextToken().equals("T")){ //If it has T, grab the two tokens for the hours from 00-23
                     iterable.nextToken();
                     hour.set(iterable.nextToken().substring(0, 2));
                 }
-                if(line.contains("sleep")){
+                if(line.contains("sleep")){ //If the value passed in contains sleep, increment.
                     context.write(hour, one);
                 } 
             }
@@ -61,9 +61,11 @@ public class MapreduceSleep {
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
         conf.set("textinputformat.record.delimiter","\n\n");
-
+        // Solution found in the comment at:https://hadoopi.wordpress.com/2013/05/27/understand-recordreader-inputsplit/
+        //Takes advantage of the empty line between tweets
+        
         Job job = Job.getInstance(conf, "sleep count");
-        job.getConfiguration().setInt("mapreduce.input.lineinputformat.linespermap", 4);
+        job.getConfiguration().setInt("mapreduce.input.lineinputformat.linespermap", 4); //Sets the conf as the lines in each tweet  = 4     
         job.setJarByClass(MapreduceSleep.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setCombinerClass(IntSumReducer.class);
