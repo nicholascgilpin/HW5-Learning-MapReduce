@@ -27,11 +27,11 @@ public class MapreduceTime {
                        ) throws IOException, InterruptedException {
             StringTokenizer iterable = new StringTokenizer(value.toString());
             
-            if(iterable.hasMoreTokens()){
-                if(iterable.nextToken().equals("T")){
+            if(iterable.hasMoreTokens()){ //If the string token has tokens, continue
+                if(iterable.nextToken().equals("T")){ //If the token is equal to T,
                     iterable.nextToken();
-                    hour.set(iterable.nextToken().substring(0, 2));
-                    context.write(hour, one);
+                    hour.set(iterable.nextToken().substring(0, 2)); //Grab the two tokens that correspond to hours from 00-23
+                    context.write(hour, one); //map it
                 }
             }
         }
