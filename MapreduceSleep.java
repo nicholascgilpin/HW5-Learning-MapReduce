@@ -9,7 +9,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.input.NLineInputFormat;
+import org.apache.hadoop.mapred.TextInputFormat;
 
 /*
 The following code was made utilizing the hadoop tutorial code at
@@ -28,18 +28,16 @@ public class MapreduceSleep {
                         ) throws IOException, InterruptedException {
             
             StringTokenizer iterable = new StringTokenizer(value.toString());
+            String line = value.toString().toLowerCase();
             
-            if(iterable.hasMoreTokens()){
+            if(iterable.hasMoreTokens() || line != null){
                 if(iterable.nextToken().equals("T")){
                     iterable.nextToken();
                     hour.set(iterable.nextToken().substring(0, 2));
-
-                    while (iterable.hasMoreTokens()) {
-                        if(iterable.nextToken().equals("sleep")){
-                            context.write(hour, one);
-                        }
-                    }
                 }
+                if(line.contains("sleep")){
+                    context.write(hour, one);
+                } 
             }
         }
     }
@@ -62,18 +60,20 @@ public class MapreduceSleep {
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
+        conf.set("textinputformat.record.delimiter","\n\n");
+
         Job job = Job.getInstance(conf, "sleep count");
-        conf.setInt(NLineInputFormat.LINES_PER_MAP, 4);
         job.getConfiguration().setInt("mapreduce.input.lineinputformat.linespermap", 4);
-        NLineInputFormat.addInputPath(job, new Path(args[0]));
         job.setJarByClass(MapreduceSleep.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setCombinerClass(IntSumReducer.class);
         job.setReducerClass(IntSumReducer.class);
-        job.setInputFormatClass(NLineInputFormat.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
+
+        FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
+        
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }
