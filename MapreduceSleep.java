@@ -35,7 +35,7 @@ public class MapreduceSleep {
                     iterable.nextToken();
                     hour.set(iterable.nextToken().substring(0, 2));
                 }
-                if(line.contains("sleep")){ //If the value passed in contains sleep, increment.
+                if(line.contains("sleep")){ //If the value passed in contains sleep, map.
                     context.write(hour, one);
                 } 
             }
